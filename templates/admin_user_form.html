@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Admin Panel</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'core:admin-dashboard' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <a href="{% url 'core:admin-product-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-box me-2"></i>Products
+                    </a>
+                    <a href="{% url 'core:admin-order-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shopping-cart me-2"></i>Orders
+                    </a>
+                    <a href="{% url 'core:admin-user-list' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-users me-2"></i>Users
+                    </a>
+                    <a href="{% url 'core:admin-coupon-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tag me-2"></i>Coupons
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-{% if form.instance.pk %}edit{% else %}user-plus{% endif %} me-2"></i>
+                    {% if form.instance.pk %}Edit User{% else %}Create New User{% endif %}
+                </h2>
+                <a href="{% url 'core:admin-user-list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Users
+                </a>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user me-2"></i>
+                        {% if form.instance.pk %}Edit User Information{% else %}Create New User Account{% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="userForm">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Please correct the following errors:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <!-- Basic Information -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.username.id_for_label }}" class="form-label">
+                                        <i class="fas fa-user me-1 text-primary"></i>Username *
+                                    </label>
+                                    {{ form.username }}
+                                    {% if form.username.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.username.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <div class="form-text">Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">
+                                        <i class="fas fa-envelope me-1 text-primary"></i>Email Address *
+                                    </label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.email.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                        <i class="fas fa-signature me-1 text-primary"></i>First Name
+                                    </label>
+                                    {{ form.first_name }}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                        <i class="fas fa-signature me-1 text-primary"></i>Last Name
+                                    </label>
+                                    {{ form.last_name }}
+                                </div>
+                            </div>
+
+                            <!-- Account Settings -->
+                            <div class="col-md-6">
+                                {% if not form.instance.pk %}
+                                <!-- Password Fields for New Users -->
+                                <div class="mb-3">
+                                    <label for="password1" class="form-label">
+                                        <i class="fas fa-lock me-1 text-primary"></i>Password *
+                                    </label>
+                                    <input type="password" name="password1" class="form-control" id="password1" required 
+                                           placeholder="Enter password">
+                                    <div class="form-text">
+                                        <small>
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Password must contain at least 8 characters.
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="password2" class="form-label">
+                                        <i class="fas fa-lock me-1 text-primary"></i>Confirm Password *
+                                    </label>
+                                    <input type="password" name="password2" class="form-control" id="password2" required 
+                                           placeholder="Confirm password">
+                                </div>
+                                {% endif %}
+
+                                <!-- Account Status -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-cog me-1 text-primary"></i>Account Settings
+                                    </label>
+                                    
+                                    <div class="form-check form-switch mb-3">
+                                        {{ form.is_active }}
+                                        <label class="form-check-label fw-medium" for="{{ form.is_active.id_for_label }}">
+                                            Active Account
+                                        </label>
+                                        <div class="form-text">
+                                            <small>Inactive users cannot log in to the system.</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-check form-switch mb-3">
+                                        {{ form.is_staff }}
+                                        <label class="form-check-label fw-medium" for="{{ form.is_staff.id_for_label }}">
+                                            Staff Member
+                                        </label>
+                                        <div class="form-text">
+                                            <small>Staff members can access the admin panel.</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-check form-switch">
+                                        {{ form.is_superuser }}
+                                        <label class="form-check-label fw-medium" for="{{ form.is_superuser.id_for_label }}">
+                                            Superuser
+                                        </label>
+                                        <div class="form-text">
+                                            <small>Superusers have all permissions without explicitly assigning them.</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- User Groups (Optional) -->
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-users me-1 text-primary"></i>User Groups
+                                    </label>
+                                    <div class="border rounded p-3 bg-light">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Group permissions can be managed in Django admin.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <div class="d-flex">
+                                        <i class="fas fa-info-circle fa-lg me-3 mt-1"></i>
+                                        <div>
+                                            <h6 class="alert-heading mb-2">User Management Tips</h6>
+                                            <ul class="mb-0 small">
+                                                <li>Use strong passwords for all user accounts</li>
+                                                <li>Only grant staff/superuser status to trusted users</li>
+                                                <li>Deactivate accounts instead of deleting them when possible</li>
+                                                <li>Use Django admin for advanced permission management</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                            <div>
+                                <a href="{% url 'core:admin-user-list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                            </div>
+                            <div class="d-flex gap-2">
+                                {% if form.instance.pk %}
+                                <a href="{% url 'core:admin-user-list' %}" class="btn btn-outline-info">
+                                    <i class="fas fa-eye me-2"></i>View All Users
+                                </a>
+                                {% endif %}
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save me-2"></i>
+                                    {% if form.instance.pk %}Update User{% else %}Create User{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Stats (for edit mode) -->
+            {% if form.instance.pk %}
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body text-center">
+                            <i class="fas fa-calendar fa-2x text-primary mb-2"></i>
+                            <h5>Member Since</h5>
+                            <p class="mb-0">{{ form.instance.date_joined|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body text-center">
+                            <i class="fas fa-sign-in-alt fa-2x text-success mb-2"></i>
+                            <h5>Last Login</h5>
+                            <p class="mb-0">
+                                {% if form.instance.last_login %}
+                                    {{ form.instance.last_login|date:"M d, Y" }}
+                                {% else %}
+                                    Never
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body text-center">
+                            <i class="fas fa-shopping-cart fa-2x text-warning mb-2"></i>
+                            <h5>Orders</h5>
+                            <p class="mb-0">{{ form.instance.orders.count }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.form-check-input:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.form-text {
+    font-size: 0.875rem;
+}
+
+.alert {
+    border: none;
+    border-radius: 10px;
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+}
+
+.btn {
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('userForm');
+    const password1 = document.getElementById('password1');
+    const password2 = document.getElementById('password2');
+
+    // Password validation for new users
+    if (password1 && password2) {
+        function validatePasswords() {
+            if (password1.value !== password2.value) {
+                password2.setCustomValidity('Passwords do not match');
+            } else {
+                password2.setCustomValidity('');
+            }
+        }
+
+        password1.addEventListener('input', validatePasswords);
+        password2.addEventListener('input', validatePasswords);
+    }
+
+    // Form submission handler
+    form.addEventListener('submit', function(e) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+        submitBtn.disabled = true;
+
+        // Re-enable after 3 seconds if still processing
+        setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }, 3000);
+    });
+
+    // Real-time username availability check (basic)
+    const usernameField = document.getElementById('{{ form.username.id_for_label }}');
+    if (usernameField) {
+        usernameField.addEventListener('blur', function() {
+            const username = this.value.trim();
+            if (username.length > 0) {
+                // You can add AJAX call here to check username availability
+                console.log('Checking username:', username);
+            }
+        });
+    }
+
+    // Toggle password visibility
+    const togglePassword = (fieldId) => {
+        const field = document.getElementById(fieldId);
+        const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
+        field.setAttribute('type', type);
+    };
+
+    // Add password toggle buttons if they don't exist
+    if (password1) {
+        const toggle1 = document.createElement('button');
+        toggle1.type = 'button';
+        toggle1.className = 'btn btn-outline-secondary btn-sm position-absolute end-0 top-50 translate-middle-y me-3';
+        toggle1.innerHTML = '<i class="fas fa-eye"></i>';
+        toggle1.style.zIndex = '5';
+        toggle1.onclick = () => togglePassword('password1');
+        
+        password1.parentElement.classList.add('position-relative');
+        password1.parentElement.appendChild(toggle1);
+    }
+
+    if (password2) {
+        const toggle2 = document.createElement('button');
+        toggle2.type = 'button';
+        toggle2.className = 'btn btn-outline-secondary btn-sm position-absolute end-0 top-50 translate-middle-y me-3';
+        toggle2.innerHTML = '<i class="fas fa-eye"></i>';
+        toggle2.style.zIndex = '5';
+        toggle2.onclick = () => togglePassword('password2');
+        
+        password2.parentElement.classList.add('position-relative');
+        password2.parentElement.appendChild(toggle2);
+    }
+});
+</script>
+{% endblock %}

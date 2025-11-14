@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Admin Panel</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'core:admin-dashboard' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <a href="{% url 'core:admin-product-list' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-box me-2"></i>Products
+                    </a>
+                    <!-- ... other menu items ... -->
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-box me-2"></i>Products Management</h2>
+                <div>
+                    <a href="{% url 'core:admin-dashboard' %}" class="btn btn-secondary me-2">
+                        <i class="fas fa-arrow-left me-2"></i>Dashboard
+                    </a>
+                    <!-- MAKE SURE THIS URL IS CORRECT -->
+                    <a href="{% url 'core:admin-product-create' %}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Add New Product
+                    </a>
+                </div>
+            </div>
+
+            <!-- ... rest of your products table ... -->
+        </div>
+    </div>
+</div>
+{% endblock %}

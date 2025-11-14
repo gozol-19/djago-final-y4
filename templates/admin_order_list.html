@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Admin Panel</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'core:admin-dashboard' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <a href="{% url 'core:admin-product-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-box me-2"></i>Products
+                    </a>
+                    <a href="{% url 'core:admin-order-list' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-shopping-cart me-2"></i>Orders
+                    </a>
+                    <a href="{% url 'core:admin-user-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-users me-2"></i>Users
+                    </a>
+                    <a href="{% url 'core:admin-coupon-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tag me-2"></i>Coupons
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-shopping-cart me-2"></i>Orders Management</h2>
+                <a href="{% url 'core:admin-dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Dashboard
+                </a>
+            </div>
+
+            <!-- Statistics -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Orders</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ orders.paginator.count }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Processing</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {% with processing_count=0 %}
+                                            {% for order in orders %}
+                                                {% if not order.being_delivered and not order.received %}
+                                                    {{ processing_count|add:1 }}
+                                                {% endif %}
+                                            {% endfor %}
+                                            {{ processing_count }}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Shipped</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {% with shipped_count=0 %}
+                                            {% for order in orders %}
+                                                {% if order.being_delivered and not order.received %}
+                                                    {{ shipped_count|add:1 }}
+                                                {% endif %}
+                                            {% endfor %}
+                                            {{ shipped_count }}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-shipping-fast fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Delivered</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {% with delivered_count=0 %}
+                                            {% for order in orders %}
+                                                {% if order.received %}
+                                                    {{ delivered_count|add:1 }}
+                                                {% endif %}
+                                            {% endfor %}
+                                            {{ delivered_count }}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Orders</h5>
+                    <span class="badge bg-light text-dark">{{ orders.paginator.count }} orders</span>
+                </div>
+                <div class="card-body">
+                    {% if orders %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-warning">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Order Date</th>
+                                    <th>Total Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ order.ref_code }}</strong>
+                                    </td>
+                                    <td>{{ order.user.username }}</td>
+                                    <td>{{ order.ordered_date|date:"M d, Y H:i" }}</td>
+                                    <td>${{ order.get_total|floatformat:2 }}</td>
+                                    <td>
+                                        {% if order.received %}
+                                        <span class="badge bg-success">Delivered</span>
+                                        {% elif order.being_delivered %}
+                                        <span class="badge bg-info">Shipped</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">Processing</span>
+                                        {% endif %}
+                                        {% if order.refund_requested %}
+                                        <br><span class="badge bg-danger">Refund Requested</span>
+                                        {% endif %}
+                                        {% if order.refund_granted %}
+                                        <br><span class="badge bg-secondary">Refund Granted</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'core:admin-order-update' order.id %}" class="btn btn-warning" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="#" class="btn btn-info" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if orders.has_other_pages %}
+                    <nav aria-label="Orders pagination" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if orders.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ orders.previous_page_number }}">Previous</a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in orders.paginator.page_range %}
+                                {% if orders.number == num %}
+                                <li class="page-item active">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if orders.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ orders.next_page_number }}">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Orders Found</h5>
+                        <p class="text-muted">There are no orders in the system yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

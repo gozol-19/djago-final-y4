@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Admin Panel</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'core:admin-dashboard' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <a href="{% url 'core:admin-product-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-box me-2"></i>Products
+                    </a>
+                    <a href="{% url 'core:admin-order-list' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-shopping-cart me-2"></i>Orders
+                    </a>
+                    <a href="{% url 'core:admin-user-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-users me-2"></i>Users
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-edit me-2"></i>Update Order #{{ object.ref_code }}</h2>
+                <a href="{% url 'core:admin-order-list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Orders
+                </a>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Order Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Order Information</h6>
+                            <p><strong>Order ID:</strong> {{ object.ref_code }}</p>
+                            <p><strong>Customer:</strong> {{ object.user.username }}</p>
+                            <p><strong>Order Date:</strong> {{ object.ordered_date }}</p>
+                            <p><strong>Total Amount:</strong> ${{ object.get_total }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Shipping Address</h6>
+                            {% if object.shipping_address %}
+                            <p>{{ object.shipping_address.street_address }}</p>
+                            <p>{{ object.shipping_address.apartment_address }}</p>
+                            <p>{{ object.shipping_address.city }}, {{ object.shipping_address.zip }}</p>
+                            {% else %}
+                            <p class="text-muted">No shipping address provided</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3 form-check form-switch">
+                                    {{ form.being_delivered }}
+                                    <label class="form-check-label" for="{{ form.being_delivered.id_for_label }}">
+                                        Being Delivered
+                                    </label>
+                                </div>
+
+                                <div class="mb-3 form-check form-switch">
+                                    {{ form.received }}
+                                    <label class="form-check-label" for="{{ form.received.id_for_label }}">
+                                        Order Received
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 form-check form-switch">
+                                    {{ form.refund_requested }}
+                                    <label class="form-check-label" for="{{ form.refund_requested.id_for_label }}">
+                                        Refund Requested
+                                    </label>
+                                </div>
+
+                                <div class="mb-3 form-check form-switch">
+                                    {{ form.refund_granted }}
+                                    <label class="form-check-label" for="{{ form.refund_granted.id_for_label }}">
+                                        Refund Granted
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'core:admin-order-list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-2"></i>Update Order
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

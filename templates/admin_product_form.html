@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Admin Panel</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'core:admin-dashboard' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <a href="{% url 'core:admin-product-list' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-box me-2"></i>Products
+                    </a>
+                    <a href="{% url 'core:admin-order-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shopping-cart me-2"></i>Orders
+                    </a>
+                    <a href="{% url 'core:admin-user-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-users me-2"></i>Users
+                    </a>
+                    <a href="{% url 'core:admin-coupon-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tag me-2"></i>Coupons
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-{% if form.instance.pk %}edit{% else %}plus{% endif %} me-2"></i>
+                    {% if form.instance.pk %}Edit Product{% else %}Add New Product{% endif %}
+                </h2>
+                <a href="{% url 'core:admin-product-list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Products
+                </a>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-box me-2"></i>
+                        {% if form.instance.pk %}Edit{% else %}Create New{% endif %} Product
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.title.id_for_label }}" class="form-label">Product Title *</label>
+                                    {{ form.title }}
+                                    {% if form.title.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.title.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.price.id_for_label }}" class="form-label">Price ($) *</label>
+                                    {{ form.price }}
+                                    {% if form.price.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.price.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.discount_price.id_for_label }}" class="form-label">Discount Price ($)</label>
+                                    {{ form.discount_price }}
+                                    <div class="form-text">Leave empty if no discount</div>
+                                    {% if form.discount_price.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.discount_price.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.category.id_for_label }}" class="form-label">Category *</label>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.category.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.label.id_for_label }}" class="form-label">Label</label>
+                                    {{ form.label }}
+                                    {% if form.label.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.label.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.image.id_for_label }}" class="form-label">Product Image</label>
+                                    {{ form.image }}
+                                    {% if form.instance.image %}
+                                    <div class="mt-2">
+                                        <small>Current image:</small>
+                                        <img src="{{ form.instance.image.url }}" alt="{{ form.instance.title }}" class="img-thumbnail mt-1" style="max-height: 100px;">
+                                    </div>
+                                    {% endif %}
+                                    {% if form.image.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.image.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.description.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.slug.id_for_label }}" class="form-label">Slug *</label>
+                            {{ form.slug }}
+                            <div class="form-text">URL-friendly version of the title</div>
+                            {% if form.slug.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.slug.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'core:admin-product-list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>
+                                {% if form.instance.pk %}Update Product{% else %}Create Product{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control, .form-select {
+    border-radius: 0.375rem;
+    border: 1px solid #ced4da;
+    padding: 0.5rem 0.75rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+}
+</style>
+{% endblock %}

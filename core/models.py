@@ -4,12 +4,14 @@ from django.db import models
 from django.db.models import Sum
 from django.shortcuts import reverse
 from django_countries.fields import CountryField
-
+from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 CATEGORY_CHOICES = (
-    ('S', 'Shirt'),
-    ('SW', 'Sport wear'),
-    ('OW', 'Outwear')
+    ('S', 'Cat'),
+    ('SW', 'Dog '),
+    ('OW', 'Other'),
+     ('OW', 'Mouse')
 )
 
 LABEL_CHOICES = (
@@ -23,13 +25,23 @@ ADDRESS_CHOICES = (
     ('S', 'Shipping'),
 )
 
+# class CustomUser(AbstractUser):
+#     email_verified = models.BooleanField(default=False)
 
+
+# class UserProfile(models.Model):
+#     user = models.OneToOneField(
+#     settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+#     stripe_customer_id = models.CharField(max_length=50, blank=True, null=True)
+#     one_click_purchasing = models.BooleanField(default=False)
+#     email = models.EmailField()
+#     def __str__(self):
+#         return self.user.username
 class UserProfile(models.Model):
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     stripe_customer_id = models.CharField(max_length=50, blank=True, null=True)
     one_click_purchasing = models.BooleanField(default=False)
-
+    email = models.EmailField(default="temp@example.com")  # Add default
     def __str__(self):
         return self.user.username
 
@@ -151,13 +163,17 @@ class Address(models.Model):
 
 class Payment(models.Model):
     stripe_charge_id = models.CharField(max_length=50)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, 
                              on_delete=models.SET_NULL, blank=True, null=True)
     amount = models.FloatField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
+        # Add a check for None user
+        if self.user:
+            return f"{self.user.username} - ${self.amount}"
+        else:
+            return f"Unknown User - ${self.amount}"
 
 
 class Coupon(models.Model):
@@ -172,7 +188,7 @@ class Refund(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     reason = models.TextField()
     accepted = models.BooleanField(default=False)
-    email = models.EmailField()
+
 
     def __str__(self):
         return f"{self.pk}"

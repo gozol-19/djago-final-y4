@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="alert alert-success text-center mt-4 shadow-sm rounded">
+                <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
+                <h2 class="alert-heading">Order Confirmed!</h2>
+                <p class="mb-0">Thank you for your purchase. Your order has been processed successfully.</p>
+            </div>
+
+            {% if order %}
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="fas fa-receipt"></i> Order #{{ order.ref_code }}</h4>
+                    <small>{{ order.ordered_date|date:"F d, Y H:i" }}</small>
+                </div>
+
+                <div class="card-body">
+                    <!-- Order Summary -->
+                    <h5 class="mb-3"><i class="fas fa-shopping-basket"></i> Order Summary</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Discount</th>
+                                    <th>Savings</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order_item in order.items.all %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ order_item.item.title }}</strong>
+                                        {% if order_item.item.discount_price %}
+                                        <span class="badge badge-success ml-1">On Sale</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ order_item.quantity }}</td>
+                                    <td>
+                                        {% if order_item.item.discount_price %}
+                                        <span class="text-muted text-decoration-line-through">
+                                            ${{ order_item.item.price|floatformat:2 }}
+                                        </span><br>
+                                        <span class="text-danger font-weight-bold">
+                                            ${{ order_item.item.discount_price|floatformat:2 }}
+                                        </span>
+                                        {% else %}
+                                        ${{ order_item.item.price|floatformat:2 }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if order_item.item.discount_price %}
+                                        <span class="text-danger font-weight-bold">
+                                            -${{ order_item.get_amount_saved|floatformat:2 }}
+                                        </span>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if order_item.get_amount_saved > 0 %}
+                                        <span class="text-success font-weight-bold">
+                                            ${{ order_item.get_amount_saved|floatformat:2 }}
+                                        </span>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="font-weight-bold">
+                                        ${{ order_item.get_final_price|floatformat:2 }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+
+                            <!-- ✅ Better Calculation Section -->
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5" class="text-right"><strong>Subtotal:</strong></td>
+                                    <td><strong>${{ order.get_subtotal|floatformat:2 }}</strong></td>
+                                </tr>
+
+                                {% if order.get_total_savings > 0 %}
+                                <tr class="table-success">
+                                    <td colspan="5" class="text-right text-success"><strong>Item Discounts:</strong></td>
+                                    <td class="text-success"><strong>- ${{ order.get_total_savings|floatformat:2 }}</strong></td>
+                                </tr>
+                                {% endif %}
+
+                                {% if order.coupon %}
+                                <tr class="table-warning">
+                                    <td colspan="5" class="text-right"><strong>Coupon ({{ order.coupon.code }}):</strong></td>
+                                    <td class="text-danger"><strong>- ${{ order.coupon.amount|floatformat:2 }}</strong></td>
+                                </tr>
+                                {% endif %}
+
+                                {% if order.get_shipping_cost %}
+                                <tr class="table-secondary">
+                                    <td colspan="5" class="text-right"><strong>Shipping:</strong></td>
+                                    <td><strong>${{ order.get_shipping_cost|floatformat:2 }}</strong></td>
+                                </tr>
+                                {% endif %}
+
+                                {% if order.get_tax %}
+                                <tr class="table-secondary">
+                                    <td colspan="5" class="text-right"><strong>Tax (10%):</strong></td>
+                                    <td><strong>${{ order.get_tax|floatformat:2 }}</strong></td>
+                                </tr>
+                                {% endif %}
+
+                                <tr class="table-info">
+                                    <td colspan="5" class="text-right">
+                                        <h5 class="mb-0"><strong>Grand Total:</strong></h5>
+                                    </td>
+                                    <td>
+                                        <h5 class="mb-0"><strong>${{ order.get_total|floatformat:2 }}</strong></h5>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Order Statistics -->
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Items Ordered</h6>
+                                    <h3 class="text-primary">{{ order.get_total_quantity }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Total Savings</h6>
+                                    <h3 class="text-success">${{ order.get_total_savings|floatformat:2 }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Order Status</h6>
+                                    <span class="badge badge-success p-2">Completed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment and Shipping -->
+                    <div class="row mt-4">
+                        {% if order.payment %}
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0"><i class="fas fa-credit-card"></i> Payment Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Payment ID:</strong> {{ order.payment.stripe_charge_id|default:"N/A" }}</p>
+                                    <p><strong>Amount Paid:</strong> ${{ order.get_total|floatformat:2 }}</p>
+                                    <p><strong>Payment Date:</strong> {{ order.payment.timestamp|date:"F d, Y H:i" }}</p>
+                                    <p><strong>Status:</strong> <span class="badge badge-success">Paid</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if order.shipping_address %}
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0"><i class="fas fa-truck"></i> Shipping Address</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-1"><strong>{{ order.shipping_address.street_address }}</strong></p>
+                                    {% if order.shipping_address.apartment_address %}
+                                    <p class="mb-1">{{ order.shipping_address.apartment_address }}</p>
+                                    {% endif %}
+                                    <p class="mb-1">{{ order.shipping_address.zip }}</p>
+                                    <p class="mb-0">{{ order.shipping_address.country.name }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center mt-4 mb-5">
+                <a href="{% url 'core:home' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-shopping-bag"></i> Continue Shopping
+                </a>
+                <button onclick="window.print()" class="btn btn-outline-secondary btn-lg ml-2">
+                    <i class="fas fa-print"></i> Print Receipt
+                </button>
+                <a href="{% url 'core:order-summary' %}" class="btn btn-outline-primary btn-lg ml-2">
+                    <i class="fas fa-list"></i> View Orders
+                </a>
+            </div>
+
+            {% else %}
+            <div class="alert alert-warning text-center mt-4">
+                <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                <h4>No Order Found</h4>
+                <p>We couldn't find your order details. Please contact support if this issue persists.</p>
+                <a href="{% url 'core:home' %}" class="btn btn-primary">Return to Home</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+@media print {
+    .btn, .alert, .action-buttons {
+        display: none !important;
+    }
+    .card {
+        border: 1px solid #000 !important;
+    }
+}
+.badge {
+    font-size: 0.75em;
+}
+.table th {
+    border-top: none;
+}
+</style>
+{% endblock %}

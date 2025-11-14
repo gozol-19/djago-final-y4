@@ -1,4 +1,4 @@
-{% extends "account/base.html" %}
+<!-- {% extends "account/base.html" %}
 
 {% load i18n %}
 
@@ -20,4 +20,38 @@ contact us if you do not receive it within a few minutes.{% endblocktrans %}</p>
 <p>{% blocktrans %}<strong>Note:</strong> you can still <a href="{{ email_url }}">change your e-mail address</a>.{% endblocktrans %}</p>
 
 
+{% endblock %} -->
+
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block head_title %}{% trans "Verify Your Email Address" %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h3 class="text-center">{% trans "Verify Your Email Address" %}</h3>
+                </div>
+                <div class="card-body text-center">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                        <h4>{% trans "Email Verification Required" %}</h4>
+                    </div>
+                    <p>{% blocktrans %}This part of the site requires you to verify your email address.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}We have sent an email to you for verification. Please click the link in that email to continue.{% endblocktrans %}</p>
+                    <p>{% blocktrans %}If you don't see the verification email in your main inbox, check your spam folder.{% endblocktrans %}</p>
+                    <form method="post" action="{% url 'account_email' %}">
+                        {% csrf_token %}
+                        <button type="submit" name="action_send" class="btn btn-primary">
+                            {% trans 'Resend Verification Email' %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

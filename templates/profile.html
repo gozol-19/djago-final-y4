@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user me-2"></i>My Profile</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- User Information -->
+                        <div class="col-md-6 mb-4">
+                            <h5 class="mb-3">Personal Information</h5>
+                            <div class="table-responsive">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td class="fw-bold" style="width: 120px;">Username:</td>
+                                        <td>{{ user.username }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Email:</td>
+                                        <td>{{ user.email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Joined:</td>
+                                        <td>{{ user.date_joined|date:"F d, Y" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Last Login:</td>
+                                        <td>{{ user.last_login|date:"F d, Y H:i" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="col-md-6 mb-4">
+                            <h5 class="mb-3">Quick Actions</h5>
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'core:order-summary' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-shopping-cart me-2"></i>View Cart
+                                </a>
+                                <a href="{% url 'core:home' %}" class="btn btn-outline-success">
+                                    <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+                                </a>
+                                <a href="{% url 'account_logout' %}" class="btn btn-outline-danger">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Order History -->
+                    <h5 class="mb-4"><i class="fas fa-history me-2"></i>Order History</h5>
+                    {% if orders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Date</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ order.ref_code }}</strong>
+                                    </td>
+                                    <td>{{ order.ordered_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% for order_item in order.items.all %}
+                                        <span class="badge bg-secondary me-1">
+                                            {{ order_item.quantity }}x {{ order_item.item.title }}
+                                        </span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>${{ order.get_total|floatformat:2 }}</td>
+                                    <td>
+                                        {% if order.being_delivered %}
+                                        <span class="badge bg-warning">Shipped</span>
+                                        {% elif order.received %}
+                                        <span class="badge bg-success">Delivered</span>
+                                        {% else %}
+                                        <span class="badge bg-info">Processing</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-bag fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Orders Yet</h4>
+                        <p class="text-muted mb-4">You haven't placed any orders yet.</p>
+                        <a href="{% url 'core:home' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.btn {
+    border-radius: 6px;
+}
+
+.table-responsive {
+    border-radius: 8px;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-shopping-cart me-2"></i>Orders Management</h2>
+        <a href="{% url 'core:admin-dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Dashboard
+        </a>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-xl-2 col-md-4 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Orders</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ orders.paginator.count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Processing</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% with processing=0 %}
+                                    {% for order in orders %}
+                                        {% if not order.being_delivered and not order.received %}
+                                            {{ processing|add:1 }}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {{ processing }}
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Shipped</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% with shipped=0 %}
+                                    {% for order in orders %}
+                                        {% if order.being_delivered and not order.received %}
+                                            {{ shipped|add:1 }}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {{ shipped }}
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shipping-fast fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Delivered</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% with delivered=0 %}
+                                    {% for order in orders %}
+                                        {% if order.received %}
+                                            {{ delivered|add:1 }}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {{ delivered }}
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Refund Requests</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% with refunds=0 %}
+                                    {% for order in orders %}
+                                        {% if order.refund_requested %}
+                                            {{ refunds|add:1 }}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {{ refunds }}
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exchange-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Orders</h5>
+            <span class="badge bg-light text-dark">{{ orders.paginator.count }} orders</span>
+        </div>
+        <div class="card-body">
+            {% if orders %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>
+                                <strong>{{ order.ref_code }}</strong>
+                            </td>
+                            <td>
+                                {{ order.user.username }}
+                                <br>
+                                <small class="text-muted">{{ order.user.email }}</small>
+                            </td>
+                            <td>{{ order.ordered_date|date:"M d, Y" }}</td>
+                            <td>
+                                {% for order_item in order.items.all %}
+                                <span class="badge bg-secondary mb-1">
+                                    {{ order_item.quantity }}x {{ order_item.item.title }}
+                                </span>
+                                <br>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <strong>${{ order.get_total|floatformat:2 }}</strong>
+                                {% if order.coupon %}
+                                <br>
+                                <small class="text-success">Coupon: {{ order.coupon.code }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if order.received %}
+                                <span class="badge bg-success">Delivered</span>
+                                {% elif order.being_delivered %}
+                                <span class="badge bg-warning">Shipped</span>
+                                {% else %}
+                                <span class="badge bg-info">Processing</span>
+                                {% endif %}
+                                
+                                {% if order.refund_requested %}
+                                <br>
+                                {% if order.refund_granted %}
+                                <span class="badge bg-success">Refunded</span>
+                                {% else %}
+                                <span class="badge bg-danger">Refund Requested</span>
+                                {% endif %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'core:admin-order-edit' order.pk %}" class="btn btn-warning" title="Edit Order">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/admin/core/order/{{ order.pk }}/change/" class="btn btn-info" title="Advanced Edit">
+                                        <i class="fas fa-cogs"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if orders.has_other_pages %}
+            <nav aria-label="Orders pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if orders.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ orders.previous_page_number }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in orders.paginator.page_range %}
+                        {% if orders.number == num %}
+                        <li class="page-item active">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if orders.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ orders.next_page_number }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No Orders Found</h5>
+                <p class="text-muted">Orders will appear here once customers start purchasing.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

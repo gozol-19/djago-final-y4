@@ -1,12 +1,38 @@
-{% extends "account/base.html" %}
-
+{% extends "base.html" %}
 {% load i18n %}
 
 {% block head_title %}{% trans "Verify Your E-mail Address" %}{% endblock %}
 
 {% block content %}
-    <h1>{% trans "Verify Your E-mail Address" %}</h1>
-
-    <p>{% blocktrans %}We have sent an e-mail to you for verification. Follow the link provided to finalize the signup process. Please contact us if you do not receive it within a few minutes.{% endblocktrans %}</p>
-
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h3 class="text-center">{% trans "Verify Your E-mail Address" %}</h3>
+                </div>
+                <div class="card-body text-center">
+                    <div class="alert alert-info">
+                        <i class="fas fa-envelope fa-2x mb-3"></i>
+                        <p>
+                            {% blocktrans %}
+                            We have sent an e-mail to you for verification. 
+                            Follow the link provided to finalize the signup process.
+                            {% endblocktrans %}
+                        </p>
+                        <p>
+                            {% blocktrans %}
+                            Please contact us if you do not receive it within a few minutes.
+                            {% endblocktrans %}
+                        </p>
+                    </div>
+                    
+                    <a href="{% url 'core:home' %}" class="btn btn-primary">
+                        {% trans 'Go to Home Page' %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

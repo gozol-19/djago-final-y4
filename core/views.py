@@ -10,10 +10,15 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
-from django.views.generic import ListView, DetailView, View
-
+from django.views.generic import ListView, DetailView, View, TemplateView, CreateView, UpdateView, DeleteView
+from django.views import View 
 from .forms import CheckoutForm, CouponForm, RefundForm, PaymentForm
 from .models import Item, OrderItem, Order, Address, Payment, Coupon, Refund, UserProfile
+from django.db.models import Q
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.decorators import method_decorator
+from django.contrib.auth.models import User
+from django.urls import reverse_lazy
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -37,6 +42,227 @@ def is_valid_form(values):
     return valid
 
 
+# ===== ADMIN LIST VIEWS =====
+
+# Product List View
+@method_decorator(staff_member_required, name='dispatch')
+class AdminProductListView(ListView):
+    model = Item
+    template_name = 'admin_product_list.html'
+    context_object_name = 'products'
+    paginate_by = 20
+    ordering = ['-id']
+
+# Order List View
+@method_decorator(staff_member_required, name='dispatch')
+class AdminOrderListView(ListView):
+    model = Order
+    template_name = 'admin_order_list.html'
+    context_object_name = 'orders'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        return Order.objects.filter(ordered=True).order_by('-ordered_date')
+
+# User List View
+@method_decorator(staff_member_required, name='dispatch')
+class AdminUserListView(ListView):
+    model = User
+    template_name = 'admin_user_list.html'
+    context_object_name = 'users'
+    paginate_by = 20
+    ordering = ['-date_joined']
+
+# Coupon List View
+@method_decorator(staff_member_required, name='dispatch')
+class AdminCouponListView(ListView):
+    model = Coupon
+    template_name = 'admin_coupon_list.html'
+    context_object_name = 'coupons'
+    paginate_by = 20
+    ordering = ['-id']
+
+# Payment List View
+@method_decorator(staff_member_required, name='dispatch')
+class AdminPaymentListView(ListView):
+    model = Payment
+    template_name = 'admin_payment_list.html'
+    context_object_name = 'payments'
+    paginate_by = 20
+    ordering = ['-timestamp']
+
+# Refund List View
+@method_decorator(staff_member_required, name='dispatch')
+class AdminRefundListView(ListView):
+    model = Refund
+    template_name = 'admin_refund_list.html'
+    context_object_name = 'refunds'
+    paginate_by = 20
+    ordering = ['-id']
+
+
+# ===== PRODUCT VIEWS =====
+@method_decorator(staff_member_required, name='dispatch')
+class AdminProductCreateView(CreateView):
+    model = Item
+    template_name = 'admin_product_form.html'
+    fields = ['title', 'price', 'discount_price', 'category', 'label', 'slug', 'description', 'image']
+    success_url = reverse_lazy('core:admin-dashboard')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Product created successfully!")
+        return super().form_valid(form)
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminProductUpdateView(UpdateView):
+    model = Item
+    template_name = 'admin_product_form.html'
+    fields = ['title', 'price', 'discount_price', 'category', 'label', 'slug', 'description', 'image']
+    success_url = reverse_lazy('core:admin-dashboard')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Product updated successfully!")
+        return super().form_valid(form)
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminProductDeleteView(DeleteView):
+    model = Item
+    template_name = 'admin_confirm_delete.html'
+    success_url = reverse_lazy('core:admin-dashboard')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['item_type'] = 'Product'
+        return context
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, "Product deleted successfully!")
+        return super().delete(request, *args, **kwargs)
+
+# ===== ORDER VIEWS =====
+@method_decorator(staff_member_required, name='dispatch')
+class AdminOrderUpdateView(UpdateView):
+    model = Order
+    template_name = 'admin_order_form.html'
+    fields = ['being_delivered', 'received', 'refund_requested', 'refund_granted']
+    success_url = reverse_lazy('core:admin-dashboard')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Order updated successfully!")
+        return super().form_valid(form)
+
+# ===== USER VIEWS =====
+@method_decorator(staff_member_required, name='dispatch')
+class AdminUserUpdateView(UpdateView):
+    model = User
+    template_name = 'admin_user_form.html'
+    fields = ['username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff']
+    success_url = reverse_lazy('core:admin-dashboard')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "User updated successfully!")
+        return super().form_valid(form)
+
+# ===== COUPON VIEWS =====
+@method_decorator(staff_member_required, name='dispatch')
+class AdminCouponCreateView(CreateView):
+    model = Coupon
+    template_name = 'admin_coupon_form.html'
+    fields = ['code', 'amount']
+    success_url = reverse_lazy('core:admin-dashboard')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Coupon created successfully!")
+        return super().form_valid(form)
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminCouponUpdateView(UpdateView):
+    model = Coupon
+    template_name = 'admin_coupon_form.html'
+    fields = ['code', 'amount']
+    success_url = reverse_lazy('core:admin-dashboard')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Coupon updated successfully!")
+        return super().form_valid(form)
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminCouponDeleteView(DeleteView):
+    model = Coupon
+    template_name = 'admin_confirm_delete.html'
+    success_url = reverse_lazy('core:admin-dashboard')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['item_type'] = 'Coupon'
+        return context
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, "Coupon deleted successfully!")
+        return super().delete(request, *args, **kwargs)
+
+# ===== REFUND VIEWS =====
+@method_decorator(staff_member_required, name='dispatch')
+class AdminRefundUpdateView(UpdateView):
+    model = Refund
+    template_name = 'admin_refund_form.html'
+    fields = ['accepted']
+    success_url = reverse_lazy('core:admin-dashboard')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Refund updated successfully!")
+        return super().form_valid(form)
+
+# ===== MAIN DASHBOARD VIEW =====
+@method_decorator(staff_member_required, name='dispatch')
+class AdminDashboardView(TemplateView):
+    template_name = 'admin_dashboard.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Statistics
+        context['total_orders'] = Order.objects.filter(ordered=True).count()
+        context['pending_orders'] = Order.objects.filter(ordered=True, being_delivered=False).count()
+        context['total_products'] = Item.objects.count()
+        context['total_users'] = User.objects.count()
+        context['total_coupons'] = Coupon.objects.count()
+        context['total_payments'] = Payment.objects.count()
+        context['pending_refunds'] = Refund.objects.filter(accepted=False).count()
+        
+        # Calculate total revenue
+        total_revenue = 0
+        payments = Payment.objects.all()
+        for payment in payments:
+            total_revenue += payment.amount
+        context['total_revenue'] = total_revenue
+        
+        # Recent data
+        context['recent_orders'] = Order.objects.filter(ordered=True).order_by('-ordered_date')[:5]
+        context['recent_products'] = Item.objects.all().order_by('-id')[:5]
+        context['recent_users'] = User.objects.all().order_by('-date_joined')[:5]
+        context['recent_payments'] = Payment.objects.all().order_by('-timestamp')[:5]
+        
+        # All data for management
+        context['products'] = Item.objects.all()
+        context['orders'] = Order.objects.filter(ordered=True).order_by('-ordered_date')[:10]
+        context['users'] = User.objects.all().order_by('-date_joined')[:10]
+        context['coupons'] = Coupon.objects.all()
+        context['payments'] = Payment.objects.all().order_by('-timestamp')[:10]
+        context['refunds'] = Refund.objects.all()
+        
+        return context
+
+# ===== CUSTOMER VIEWS =====
+    
+class ProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'profile.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['orders'] = Order.objects.filter(user=self.request.user, ordered=True).order_by('-ordered_date')
+        return context
+    
 class CheckoutView(View):
     def get(self, *args, **kwargs):
         try:
@@ -76,11 +302,13 @@ class CheckoutView(View):
         try:
             order = Order.objects.get(user=self.request.user, ordered=False)
             if form.is_valid():
-
+                # Initialize shipping_address to None at the start
+                shipping_address = None
+                
                 use_default_shipping = form.cleaned_data.get(
                     'use_default_shipping')
                 if use_default_shipping:
-                    print("Using the defualt shipping address")
+                    print("Using the default shipping address")
                     address_qs = Address.objects.filter(
                         user=self.request.user,
                         address_type='S',
@@ -123,10 +351,10 @@ class CheckoutView(View):
                         if set_default_shipping:
                             shipping_address.default = True
                             shipping_address.save()
-
                     else:
                         messages.info(
                             self.request, "Please fill in the required shipping address fields")
+                        return redirect('core:checkout')  # Added return to prevent continuation
 
                 use_default_billing = form.cleaned_data.get(
                     'use_default_billing')
@@ -134,6 +362,12 @@ class CheckoutView(View):
                     'same_billing_address')
 
                 if same_billing_address:
+                    # Check if shipping_address is available before using it
+                    if shipping_address is None:
+                        messages.info(
+                            self.request, "Please provide a valid shipping address first")
+                        return redirect('core:checkout')
+                        
                     billing_address = shipping_address
                     billing_address.pk = None
                     billing_address.save()
@@ -143,7 +377,7 @@ class CheckoutView(View):
                     order.save()
 
                 elif use_default_billing:
-                    print("Using the defualt billing address")
+                    print("Using the default billing address")
                     address_qs = Address.objects.filter(
                         user=self.request.user,
                         address_type='B',
@@ -186,10 +420,10 @@ class CheckoutView(View):
                         if set_default_billing:
                             billing_address.default = True
                             billing_address.save()
-
                     else:
                         messages.info(
                             self.request, "Please fill in the required billing address fields")
+                        return redirect('core:checkout')  # Added return to prevent continuation
 
                 payment_option = form.cleaned_data.get('payment_option')
 
@@ -298,7 +532,7 @@ class PaymentView(View):
                 order.save()
 
                 messages.success(self.request, "Your order was successful!")
-                return redirect("/")
+                return redirect("core:order-confirmation")
 
             except stripe.error.CardError as e:
                 body = e.json_body
@@ -344,12 +578,48 @@ class PaymentView(View):
         messages.warning(self.request, "Invalid data received")
         return redirect("/payment/stripe/")
 
+class OrderConfirmationView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        try:
+            # Get the most recent completed order
+            order = Order.objects.filter(
+                user=self.request.user, 
+                ordered=True
+            ).order_by('-ordered_date').first()
+            
+            if not order:
+                messages.warning(self.request, "No completed order found")
+                return redirect("core:home")
+                
+            context = {
+                'order': order
+            }
+            return render(self.request, "order_confirmation.html", context)
+            
+        except ObjectDoesNotExist:
+            messages.warning(self.request, "No completed order found")
+            return redirect("core:home")
 
 class HomeView(ListView):
     model = Item
-    paginate_by = 10
+    paginate_by = 8
     template_name = "home.html"
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        category = self.request.GET.get('category')
+        search_query = self.request.GET.get('q')
+        
+        if category and category != "all":
+            queryset = queryset.filter(category=category)
+            
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) |
+                Q(description__icontains=search_query)
+            )
+            
+        return queryset
 
 class OrderSummaryView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):

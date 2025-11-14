@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Admin Panel</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'core:admin-dashboard' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <a href="{% url 'core:admin-product-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-box me-2"></i>Products
+                    </a>
+                    <a href="{% url 'core:admin-coupon-list' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-tag me-2"></i>Coupons
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-{% if form.instance.pk %}edit{% else %}plus{% endif %} me-2"></i>
+                    {% if form.instance.pk %}Edit Coupon{% else %}Create New Coupon{% endif %}
+                </h2>
+                <a href="{% url 'core:admin-coupon-list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Coupons
+                </a>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tag me-2"></i>
+                        {% if form.instance.pk %}Edit{% else %}Create New{% endif %} Coupon
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.code.id_for_label }}" class="form-label">Coupon Code *</label>
+                                    {{ form.code }}
+                                    <div class="form-text">Enter a unique coupon code (uppercase recommended)</div>
+                                    {% if form.code.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.code.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.amount.id_for_label }}" class="form-label">Discount Amount ($) *</label>
+                                    {{ form.amount }}
+                                    <div class="form-text">Enter the discount amount in dollars</div>
+                                    {% if form.amount.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.amount.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'core:admin-coupon-list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-save me-2"></i>
+                                {% if form.instance.pk %}Update Coupon{% else %}Create Coupon{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

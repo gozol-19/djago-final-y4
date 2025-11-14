@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Admin Panel</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'core:admin-dashboard' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    
+                    <!-- Products -->
+                    <a href="{% url 'core:admin-product-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-box me-2"></i>Products ({{ total_products }})
+                    </a>
+                    
+                    <!-- Orders -->
+                    <a href="{% url 'core:admin-order-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shopping-cart me-2"></i>Orders ({{ total_orders }})
+                    </a>
+                    
+                    <!-- Users -->
+                    <a href="{% url 'core:admin-user-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-users me-2"></i>Users ({{ total_users }})
+                    </a>
+                    
+                    <!-- Coupons -->
+                    <a href="{% url 'core:admin-coupon-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tag me-2"></i>Coupons ({{ total_coupons }})
+                    </a>
+                    
+                    <!-- Payments -->
+                    <a href="{% url 'core:admin-payment-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-credit-card me-2"></i>Payments ({{ total_payments }})
+                    </a>
+                    
+                    <!-- Refunds -->
+                    <a href="{% url 'core:admin-refund-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-exchange-alt me-2"></i>Refunds ({{ pending_refunds }} pending)
+                    </a>
+                    
+                    <a href="/admin/" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shield-alt me-2"></i>Django Admin
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h2>
+                <div>
+                    <span class="badge bg-success fs-6">Welcome, {{ request.user.username }}</span>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-2 mb-2">
+                                    <a href="{% url 'core:admin-product-create' %}" class="btn btn-success w-100">
+                                        <i class="fas fa-plus me-2"></i>Add Product
+                                    </a>
+                                </div>
+                                <div class="col-md-2 mb-2">
+                                    <a href="{% url 'core:admin-coupon-create' %}" class="btn btn-info w-100">
+                                        <i class="fas fa-tag me-2"></i>Add Coupon
+                                    </a>
+                                </div>
+                                <div class="col-md-2 mb-2">
+                                    <a href="/admin/auth/user/add/" class="btn btn-warning w-100">
+                                        <i class="fas fa-user-plus me-2"></i>Add User
+                                    </a>
+                                </div>
+                                <div class="col-md-2 mb-2">
+                                    <a href="{% url 'core:admin-order-list' %}" class="btn btn-danger w-100">
+                                        <i class="fas fa-shopping-cart me-2"></i>View Orders
+                                    </a>
+                                </div>
+                                <div class="col-md-2 mb-2">
+                                    <a href="{% url 'core:admin-payment-list' %}" class="btn btn-dark w-100">
+                                        <i class="fas fa-credit-card me-2"></i>Payments
+                                    </a>
+                                </div>
+                                <div class="col-md-2 mb-2">
+                                    <a href="{% url 'core:admin-refund-list' %}" class="btn btn-secondary w-100">
+                                        <i class="fas fa-exchange-alt me-2"></i>Refunds
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-xl-2 col-md-4 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Revenue</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">${{ total_revenue|floatformat:2 }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 col-md-4 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Orders</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_orders }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 col-md-4 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Products</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_products }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-box fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 col-md-4 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Users</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_users }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 col-md-4 mb-4">
+                    <div class="card border-left-danger shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Coupons</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_coupons }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-tag fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-2 col-md-4 mb-4">
+                    <div class="card border-left-secondary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Refunds</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_refunds }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-exchange-alt fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="row">
+                <!-- Recent Orders -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Recent Orders</h6>
+                            <a href="{% url 'core:admin-order-list' %}" class="btn btn-light btn-sm">View All</a>
+                        </div>
+                        <div class="card-body">
+                            {% if recent_orders %}
+                            <div class="list-group list-group-flush">
+                                {% for order in recent_orders %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ order.ref_code }}</h6>
+                                        <small class="text-muted">{{ order.user.username }} • ${{ order.get_total|floatformat:2 }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-muted">{{ order.ordered_date|date:"M d" }}</small>
+                                        <br>
+                                        {% if order.received %}
+                                        <span class="badge bg-success">Delivered</span>
+                                        {% elif order.being_delivered %}
+                                        <span class="badge bg-warning">Shipped</span>
+                                        {% else %}
+                                        <span class="badge bg-info">Processing</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted text-center py-3">No orders yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Products -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0"><i class="fas fa-box me-2"></i>Recent Products</h6>
+                            <a href="{% url 'core:admin-product-list' %}" class="btn btn-light btn-sm">View All</a>
+                        </div>
+                        <div class="card-body">
+                            {% if recent_products %}
+                            <div class="list-group list-group-flush">
+                                {% for product in recent_products %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ product.title }}</h6>
+                                        <small class="text-muted">${{ product.price }} • {{ product.get_category_display }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-muted">{{ product.get_label_display }}</small>
+                                        <br>
+                                        {% if product.discount_price %}
+                                        <span class="badge bg-danger">SALE</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted text-center py-3">No products yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Users & Payments -->
+            <div class="row">
+                <!-- Recent Users -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0"><i class="fas fa-users me-2"></i>Recent Users</h6>
+                            <a href="{% url 'core:admin-user-list' %}" class="btn btn-light btn-sm">View All</a>
+                        </div>
+                        <div class="card-body">
+                            {% if recent_users %}
+                            <div class="list-group list-group-flush">
+                                {% for user in recent_users %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ user.username }}</h6>
+                                        <small class="text-muted">{{ user.email }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-muted">{{ user.date_joined|date:"M d" }}</small>
+                                        <br>
+                                        {% if user.is_staff %}
+                                        <span class="badge bg-danger">Staff</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">User</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted text-center py-3">No users yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Payments -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0"><i class="fas fa-credit-card me-2"></i>Recent Payments</h6>
+                            <a href="{% url 'core:admin-payment-list' %}" class="btn btn-light btn-sm">View All</a>
+                        </div>
+                        <div class="card-body">
+                            {% if recent_payments %}
+                            <div class="list-group list-group-flush">
+                                {% for payment in recent_payments %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ payment.user.username }}</h6>
+                                        <small class="text-muted">{{ payment.stripe_charge_id|slice:":20" }}...</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-muted">{{ payment.timestamp|date:"M d" }}</small>
+                                        <br>
+                                        <span class="badge bg-success">${{ payment.amount }}</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted text-center py-3">No payments yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

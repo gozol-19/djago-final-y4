@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Admin Panel</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'core:admin-dashboard' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <a href="{% url 'core:admin-product-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-box me-2"></i>Products
+                    </a>
+                    <a href="{% url 'core:admin-order-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shopping-cart me-2"></i>Orders
+                    </a>
+                    <a href="{% url 'core:admin-user-list' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-users me-2"></i>Users
+                    </a>
+                    <a href="{% url 'core:admin-coupon-list' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tag me-2"></i>Coupons
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-users me-2"></i>Users Management</h2>
+                <div>
+                    <a href="{% url 'core:admin-dashboard' %}" class="btn btn-secondary me-2">
+                        <i class="fas fa-arrow-left me-2"></i>Dashboard
+                    </a>
+                    <a href="/admin/auth/user/add/" class="btn btn-success" target="_blank">
+                        <i class="fas fa-user-plus me-2"></i>Add New User
+                    </a>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Users</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ users.paginator.count }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Active Users</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {% with active_users=users|length %}
+                                            {% for user in users %}
+                                                {% if not user.is_active %}
+                                                    {% widthratio 1 1 active_users|add:"-1" as active_users %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            {{ active_users }}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Staff Members</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {% with staff_count=0 %}
+                                            {% for user in users %}
+                                                {% if user.is_staff %}
+                                                    {% widthratio 1 1 staff_count|add:"1" as staff_count %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            {{ staff_count }}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-user-shield fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Superusers</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        {% with superuser_count=0 %}
+                                            {% for user in users %}
+                                                {% if user.is_superuser %}
+                                                    {% widthratio 1 1 superuser_count|add:"1" as superuser_count %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            {{ superuser_count }}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-crown fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Users</h5>
+                    <span class="badge bg-light text-dark">{{ users.paginator.count }} users</span>
+                </div>
+                <div class="card-body">
+                    {% if users %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-info">
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Date Joined</th>
+                                    <th>Last Login</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ user.username }}</strong>
+                                        {% if user.is_superuser %}
+                                        <br><small class="text-danger"><i class="fas fa-crown"></i> Superuser</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.first_name|default:"-" }}</td>
+                                    <td>{{ user.last_name|default:"-" }}</td>
+                                    <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                                    <td>{{ user.last_login|date:"M d, Y"|default:"Never" }}</td>
+                                    <td>
+                                        {% if user.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                        <br>
+                                        {% if user.is_staff %}
+                                        <span class="badge bg-warning">Staff</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'core:admin-user-update' user.id %}" class="btn btn-warning" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="/admin/auth/user/{{ user.id }}/change/" class="btn btn-info" target="_blank" title="Advanced Edit">
+                                                <i class="fas fa-cog"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if users.has_other_pages %}
+                    <nav aria-label="Users pagination" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if users.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ users.previous_page_number }}">Previous</a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in users.paginator.page_range %}
+                                {% if users.number == num %}
+                                <li class="page-item active">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if users.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ users.next_page_number }}">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Users Found</h5>
+                        <p class="text-muted">There are no users in the system yet.</p>
+                        <a href="/admin/auth/user/add/" class="btn btn-info" target="_blank">
+                            <i class="fas fa-user-plus me-2"></i>Add User via Django Admin
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

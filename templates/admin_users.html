@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-users me-2"></i>Users Management</h2>
+        <div>
+            <a href="{% url 'core:admin-dashboard' %}" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-left me-2"></i>Dashboard
+            </a>
+            <a href="/admin/auth/user/add/" class="btn btn-success">
+                <i class="fas fa-user-plus me-2"></i>Add New User
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Users</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ users.paginator.count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Active Users</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% with active=0 %}
+                                    {% for user in users %}
+                                        {% if user.is_active %}
+                                            {{ active|add:1 }}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {{ active }}
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Staff Members</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% with staff=0 %}
+                                    {% for user in users %}
+                                        {% if user.is_staff %}
+                                            {{ staff|add:1 }}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {{ staff }}
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-crown fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Recent (7 days)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% with recent=0 %}
+                                    {% for user in users %}
+                                        {% if user.date_joined|timesince <= "7 days" %}
+                                            {{ recent|add:1 }}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {{ recent }}
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Users</h5>
+            <span class="badge bg-light text-dark">{{ users.paginator.count }} users</span>
+        </div>
+        <div class="card-body">
+            {% if users %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-warning">
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Name</th>
+                            <th>Joined</th>
+                            <th>Last Login</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                <strong>{{ user.username }}</strong>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if user.first_name or user.last_name %}
+                                {{ user.first_name }} {{ user.last_name }}
+                                {% else %}
+                                <span class="text-muted">Not set</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                            <td>
+                                {% if user.last_login %}
+                                {{ user.last_login|date:"M d, Y" }}
+                                {% else %}
+                                <span class="text-muted">Never</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                                <br>
+                                {% if user.is_staff %}
+                                <span class="badge bg-primary">Staff</span>
+                                {% endif %}
+                                {% if user.is_superuser %}
+                                <span class="badge bg-danger">Superuser</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'core:admin-user-edit' user.pk %}" class="btn btn-warning" title="Edit User">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/admin/auth/user/{{ user.pk }}/change/" class="btn btn-info" title="Advanced Edit">
+                                        <i class="fas fa-cogs"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if users.has_other_pages %}
+            <nav aria-label="Users pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if users.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ users.previous_page_number }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in users.paginator.page_range %}
+                        {% if users.number == num %}
+                        <li class="page-item active">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if users.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ users.next_page_number }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No Users Found</h5>
+                <p class="text-muted">Users will appear here once they register.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
