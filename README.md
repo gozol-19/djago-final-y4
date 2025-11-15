@@ -124,7 +124,7 @@ New users
 
 Recent activity
 
-5️⃣ Screenshots (very important)
+5️⃣ Pages
 
 Add these slides:
 
@@ -148,23 +148,7 @@ Order management
 
 User management
 
-6️⃣ Code Highlights (ONLY short pieces)
-
-Pick 5 important snippets like:
-
-add_to_cart()
-
-CheckoutView
-
-Stripe charge integration
-
-AdminProductCreateView
-
-Dashboard statistics query
-
-DON’T show the whole file — show only 5–10 important parts.
-
-7️⃣ Technology Stack
+6️⃣ Technology Stack
 Backend
 
 Python 3
@@ -205,15 +189,6 @@ Building admin dashboards
 
 Handling real-world business logic
 
-9️⃣ Optional (Nice Add-ons)
-
-If you want to impress:
-
-Create a video demo (2–3 mins)
-
-Upload project on GitHub
-
-Deploy on PythonAnywhere / Render / Railway
 
 Add a README.md
 ---
