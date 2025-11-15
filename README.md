@@ -1,4 +1,221 @@
+1️⃣ Project Title & Summary
 
+Project Title: Django E-Commerce Website with Stripe Payment & Admin Dashboard
+Short Summary:
+This is a fully functional e-commerce web application built with Django. It includes product management, shopping cart, checkout system, Stripe payment integration, order tracking, coupon system, and an advanced admin dashboard.
+
+2️⃣ Features Overview
+🛒 User Features
+
+Browse products by category
+
+Search products
+
+View product details
+
+Add/remove products from cart
+
+Update cart quantity
+
+Checkout
+
+Save shipping/billing addresses
+
+Stripe payment system
+
+View past orders
+
+Order confirmation page
+
+User profile page
+
+🔑 Admin Features
+
+(Admin login required: @staff_member_required)
+
+Admin Dashboard (overview + statistics)
+
+Manage Products (CRUD)
+
+Manage Orders (update status: delivered, received, refund)
+
+Manage Users (edit: activate/deactivate account, set staff role)
+
+Manage Coupons (CRUD)
+
+Manage Payments (view history)
+
+Manage Refunds (approve/deny)
+
+3️⃣ System Architecture
+
+Explain the layers:
+
+Backend
+
+Django Class-Based Views (CBV)
+
+Stripe API integration
+
+Django ORM Models:
+
+Item (Product)
+
+OrderItem
+
+Order
+
+Address
+
+Payment
+
+Coupon
+
+Refund
+
+UserProfile
+
+Frontend
+
+HTML / CSS / Bootstrap
+
+Django Template System
+
+4️⃣ Key Functionalities (Explain each)
+✔ Add to Cart
+
+Checks if active order exists
+
+Adds or increases product quantity
+
+✔ Checkout
+
+User can:
+
+Use default address
+
+Enter new address
+
+Save address as default
+
+Billing and shipping logic
+
+Payment method selection
+
+✔ Stripe Payment
+
+Save card
+
+One-click payment
+
+Process charges through Stripe API
+
+Handle exceptions (CardError, RateLimitError, etc.)
+
+✔ Admin Dashboard Statistics
+
+Total orders
+
+Total revenue
+
+Pending orders
+
+New users
+
+Recent activity
+
+5️⃣ Screenshots (very important)
+
+Add these slides:
+
+Home page
+
+Product detail page
+
+Cart page
+
+Checkout page
+
+Payment page
+
+Order confirmation
+
+Admin dashboard
+
+Product CRUD
+
+Order management
+
+User management
+
+6️⃣ Code Highlights (ONLY short pieces)
+
+Pick 5 important snippets like:
+
+add_to_cart()
+
+CheckoutView
+
+Stripe charge integration
+
+AdminProductCreateView
+
+Dashboard statistics query
+
+DON’T show the whole file — show only 5–10 important parts.
+
+7️⃣ Technology Stack
+Backend
+
+Python 3
+
+Django
+
+Django ORM
+
+Payment
+
+Stripe API
+
+Database
+
+MySQL / SQLite
+
+Frontend
+
+HTML
+
+CSS
+
+Bootstrap
+
+Django Templates
+
+8️⃣ Conclusion
+
+Explain what you learned:
+
+How to structure a Django project
+
+Working with Class-Based Views
+
+Integrating Payment Gateway
+
+Building admin dashboards
+
+Handling real-world business logic
+
+9️⃣ Optional (Nice Add-ons)
+
+If you want to impress:
+
+Create a video demo (2–3 mins)
+
+Upload project on GitHub
+
+Deploy on PythonAnywhere / Render / Railway
+
+Add a README.md
 ---
 
 # Django E-commerce
