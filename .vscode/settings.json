@@ -10,4 +10,5 @@
   "files.exclude": {
     "**/*.pyc": true
   }
+  
 }
